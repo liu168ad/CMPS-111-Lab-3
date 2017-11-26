@@ -73,8 +73,8 @@ static bool load(const char *cmdline, void (**eip) (void), void **esp);
 static void
 push_command(const char *cmdline UNUSED, void **esp)
 {
-    printf("Base Address: 0x%08x\n", (unsigned int) *esp);
-    printf("cmdline: %s\n", cmdline);
+//    printf("Base Address: 0x%08x\n", (unsigned int) *esp);
+//    printf("cmdline: %s\n", cmdline);
     
     /* Get the number of arguments*/
     int argc = 1;
@@ -99,7 +99,6 @@ push_command(const char *cmdline UNUSED, void **esp)
             memcpy(arguments[j], &cmdline[parse], arg_length);
             
             arguments[j][arg_length] = '\0'; 
-            argv_addr[j] = *esp;
         }
         else if (*(cmdline + i) == ' ')
         {
@@ -107,28 +106,41 @@ push_command(const char *cmdline UNUSED, void **esp)
             memcpy(arguments[j], &cmdline[parse], arg_length);
             
             arguments[j][arg_length] = '\0'; 
-            argv_addr[j] = *esp;
             j++;
             parse = i + 1;
         }
     }
     
-    
-    for(int i=0;i<argc;i++)
+    // Print out the arguments
+    for(int i=argc-1;i>=0;i--)
     {
-        printf("\n");
-        printf("Argument: %s\n", arguments[i]);
-        printf("\n");
+        int arg_length = strlen(arguments[i])+1;
+        *esp -= arg_length;
+        argv_addr[i] = *esp;
+        memcpy(*esp, arguments[i], arg_length);
+        
+        //printf("Argument Address: 0x%08x\n", (unsigned int) *esp);
+        
+//        for(int i=0;i<arg_length;i++)
+//        {
+//            printf("Character: %c\n", *(((char*) *esp) + i));
+//            if(*(((char*) *esp) + i) == '\0')
+//            {
+//                printf("Null terminating character\n");
+//            }
+//        }
+        
+        *esp = (void*) ((unsigned int) (*esp) & 0xfffffffc);
+        
     }
     
-    /*
+    //printf("Memory Align Address: 0x%08x\n", (unsigned int) *esp);
      
     // Set NULL Sentinel
     *esp -= 4;
     *((uint32_t*) *esp) = 0;
     
-    //printf("Address: 0x%08x\n", (unsigned int) *esp);
-    //printf("Argc: %d\n", argc);
+    //printf("Address After Null Sentinel: 0x%08x\n", (unsigned int) *esp);
     
     // Set argv to point at addresses
     for(int i=argc-1;i>=0;i--)
@@ -136,7 +148,11 @@ push_command(const char *cmdline UNUSED, void **esp)
         *esp -= 4;
         *((void**) *esp) = argv_addr[i];
         
-        //printf("Reference address: 0x%08x\n", (unsigned int) argv_addr[i]);
+//        printf("\n");
+//        printf("Reference address: 0x%08x\n", (unsigned int) argv_addr[i]);
+//        printf("\n");
+//        
+//        printf("Address of Pointer to Argument: 0x%08x\n", (unsigned int) *esp);
         //printf("Address: 0x%08x\n", (unsigned int) *esp);
     }
     
@@ -144,15 +160,22 @@ push_command(const char *cmdline UNUSED, void **esp)
     *esp -= 4;
     *((void**) *esp) = (*esp + 4);
     
+    //printf("Address After Pointer to argv: 0x%08x\n", (unsigned int) *esp);
+    
     // Set argc
     *esp -= 4;
     *((int*) *esp) = argc;
     
+    //printf("Address After Setting Argc: 0x%08x\n", (unsigned int) *esp);
+    
     // Set return address
     *esp -= 4;
      *((int*) *esp) = 0;
+     
+    //printf("Address After Return: 0x%08x\n", (unsigned int) *esp);
     
-    
+     
+    /*
     int arg_length = strlen(cmdline)+1;
     *esp -= arg_length;
     memcpy(*esp, cmdline, arg_length);
@@ -180,13 +203,8 @@ push_command(const char *cmdline UNUSED, void **esp)
     // Set return addr
     *esp -= 4;
     *((int*) *esp) = 0;
-     
     */
-    
-    
-    
-    
-
+     
     // Some of you CMPS111 Lab 3 code will go here.
     //
     // One approach is to immediately call a function you've created in a
@@ -234,8 +252,26 @@ process_execute(const char *cmdline)
     
     strlcpy(cmdline_copy, cmdline, PGSIZE);
 
+    /*Get the filename for the thread*/
+    int file_length = 0;
+    for(int i=0; i<=(int)strlen(cmdline); i++)
+    {           
+        if(*(cmdline + i) == '\0')
+        {
+            file_length = i;
+        }
+        else if(*(cmdline + i) == ' ')
+        {
+            file_length = i;
+            break;
+        }
+    }
+    char filename[file_length+1];
+    memcpy(filename, cmdline, file_length);
+    filename[file_length] = '\0';
+    
     // Create a Kernel Thread for the new process
-    tid = thread_create(cmdline, PRI_DEFAULT, start_process, cmdline_copy);
+    tid = thread_create(filename, PRI_DEFAULT, start_process, cmdline_copy);
 
     timer_msleep(10);
 
@@ -252,8 +288,9 @@ start_process(void *cmdline)
 {
     bool success = false;
     
+    /*Get the filename for the thread*/
     int file_length = 0;
-    char *cmdtemp = (char *)cmdline;
+    const char *cmdtemp = (char *) cmdline;
     for(int i=0; i<=(int)strlen(cmdtemp); i++)
     {           
         if(*(cmdtemp + i) == '\0')
@@ -266,10 +303,9 @@ start_process(void *cmdline)
             break;
         }
     }
-    
     char filename[file_length+1];
-    memcpy(filename, cmdline, file_length);
-    filename[file_length+1] = '\0';
+    memcpy(filename, cmdtemp, file_length);
+    filename[file_length] = '\0';
     
     
     // Initialize interrupt frame and load executable. 

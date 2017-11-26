@@ -13,8 +13,10 @@
             <file>file:/home/pintos/pintos/src/userprog/process.h</file>
             <file>file:/home/pintos/pintos/src/threads/thread.c</file>
             <file>file:/home/pintos/pintos/src/threads/init.c</file>
+            <file>file:/home/pintos/pintos/src/userprog/syscall.c</file>
             <file>file:/home/pintos/pintos/src/userprog/process.c</file>
-            <file>file:/home/pintos/pintos/src/userprog/build/tests/userprog/args-single.result</file>
+            <file>file:/home/pintos/pintos/src/userprog/exception.c</file>
+            <file>file:/home/pintos/pintos/src/threads/palloc.c</file>
         </group>
     </open-files>
 </project-private>
