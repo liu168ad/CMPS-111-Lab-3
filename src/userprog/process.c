@@ -87,49 +87,42 @@ push_command(const char *cmdline UNUSED, void **esp)
     }
     
     void *argv_addr[argc];
+    char arguments[argc][20];
     
+    /*Put the arguments into a string array or double char array*/
     int parse = 0;
-    for(int i=0,j=0;i<(int)strlen(cmdline)+1;i++)
+    for(int i=0,j=0;i<=(int)strlen(cmdline);i++)
     {
         if(*(cmdline + i) == '\0')
         {   
             int arg_length = i+1-parse;
+            memcpy(arguments[j], &cmdline[parse], arg_length);
             
-            *esp -= arg_length;
-            
-            memcpy(*esp, (cmdline+parse), arg_length);
-            
-            //printf("ESP: 0x%08x\n", (unsigned int) *esp);
-            
+            arguments[j][arg_length] = '\0'; 
             argv_addr[j] = *esp;
-            j++;
-            
-            *esp = (void*) ((unsigned int) (*esp) & 0xfffffffc);
-            //printf("Address: 0x%08x\n", (unsigned int) *esp);
         }
         else if (*(cmdline + i) == ' ')
         {
             int arg_length = i-parse;
+            memcpy(arguments[j], &cmdline[parse], arg_length);
             
-            //printf("Arg length: %d\n", arg_length);
-            
-            *esp -= arg_length;
-            memcpy(*esp, (cmdline+parse), arg_length);
-            
-            //printf("ESP: 0x%08x\n", (unsigned int) *esp);
-            
+            arguments[j][arg_length] = '\0'; 
             argv_addr[j] = *esp;
             j++;
-            
             parse = i + 1;
-            *esp = (void*) ((unsigned int) (*esp) & 0xfffffffc);
-            
-            //printf("Address: 0x%08x\n", (unsigned int) *esp);
         }
     }
     
-    //printf("Address: 0x%08x\n", (unsigned int) *esp);
     
+    for(int i=0;i<argc;i++)
+    {
+        printf("\n");
+        printf("Argument: %s\n", arguments[i]);
+        printf("\n");
+    }
+    
+    /*
+     
     // Set NULL Sentinel
     *esp -= 4;
     *((uint32_t*) *esp) = 0;
@@ -159,7 +152,7 @@ push_command(const char *cmdline UNUSED, void **esp)
     *esp -= 4;
      *((int*) *esp) = 0;
     
-    /*
+    
     int arg_length = strlen(cmdline)+1;
     *esp -= arg_length;
     memcpy(*esp, cmdline, arg_length);
@@ -187,6 +180,7 @@ push_command(const char *cmdline UNUSED, void **esp)
     // Set return addr
     *esp -= 4;
     *((int*) *esp) = 0;
+     
     */
     
     
@@ -260,22 +254,23 @@ start_process(void *cmdline)
     
     int file_length = 0;
     char *cmdtemp = (char *)cmdline;
-    for(int i=0; i<(int)strlen(cmdtemp)+1; i++)
+    for(int i=0; i<=(int)strlen(cmdtemp); i++)
     {           
         if(*(cmdtemp + i) == '\0')
         {
-            file_length = i+1;
+            file_length = i;
         }
-        else if( *(cmdtemp + i) == ' ')
+        else if(*(cmdtemp + i) == ' ')
         {
             file_length = i;
             break;
         }
     }
     
-    char filename[file_length];
+    char filename[file_length+1];
     memcpy(filename, cmdline, file_length);
-    filename[file_length] = '\0';
+    filename[file_length+1] = '\0';
+    
     
     // Initialize interrupt frame and load executable. 
     struct intr_frame pif;
