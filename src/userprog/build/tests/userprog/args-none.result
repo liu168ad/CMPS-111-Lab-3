@@ -1,0 +1,26 @@
+FAIL
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (args) begin
+  (args) argc = 1
+  (args) argv[0] = 'args-none'
+  (args) argv[1] = null
+  (args) end
+  args-none: exit(0)
+Differences in `diff -u' format:
++ Base Address: 0xc0000000
++ cmdline: args-none
++ ESP: 0xbffffff6
++ Address: 0xbffffff4
++ Address: 0xbffffff4
++ Address: 0xbffffff0
++ Argc: 1
++ Reference address: 0xbffffff6
++ Address: 0xbfffffec
+  (args) begin
+  (args) argc = 1
+  (args) argv[0] = 'args-none'
+  (args) argv[1] = null
+  (args) end
+  args-none: exit(0)
