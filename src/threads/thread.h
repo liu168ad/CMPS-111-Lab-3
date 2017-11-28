@@ -41,6 +41,7 @@
 #include "vm/page.h"
 #endif
 
+#include "userprog/utils.h"
 /* States in a thread's life cycle. */
 enum thread_status
   {
@@ -130,6 +131,8 @@ struct thread
     struct list_elem allelem;   // List element for all threads list
     struct list_elem waitelem;  // List element, stored in the wait_list queue 
     int64_t sleep_endtick;      // The tick after which the thread should wakeup 
+    
+    void *aux;
 
     // Shared between thread.c and smeaphore.c. 
     struct list_elem elem;      // List element for the semaphore wiaitng list or the global ready_list

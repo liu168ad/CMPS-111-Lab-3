@@ -37,6 +37,8 @@
       <in>tss.h</in>
       <in>umem.c</in>
       <in>umem.h</in>
+      <in>utils.c</in>
+      <in>utils.h</in>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>

@@ -9,6 +9,6 @@ Acceptable output:
 Differences in `diff -u' format:
   (create-long) begin
 - (create-long) create("x..."): 0
-- (create-long) end
-- create-long: exit(0)
-+ [ERROR] system call 4 is unimplemented!
++ (create-long) create("x..."): 1
+  (create-long) end
+  create-long: exit(0)

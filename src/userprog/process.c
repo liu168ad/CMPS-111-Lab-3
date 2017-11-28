@@ -54,6 +54,7 @@
 #include "userprog/pagedir.h"
 #include "userprog/syscall.h"
 #include "userprog/process.h"
+#include "userprog/utils.h"
 #include "devices/timer.h"
 
 // *****************************************************************
@@ -76,12 +77,23 @@ push_command(const char *cmdline UNUSED, void **esp)
 //    printf("Base Address: 0x%08x\n", (unsigned int) *esp);
 //    printf("cmdline: %s\n", cmdline);
     
-    /* Get the number of arguments*/
+    /* Get the number of arguments */
     int argc = 1;
     for(int i=0; i<(int)strlen(cmdline); i++)
-    {
+    {   
         if(*(cmdline+i) == ' ')
         {
+            /* Get the index of the next character that is not whitespace
+             * and set it to variable i */
+            for(int j=i+1;j<(int)strlen(cmdline);j++)
+            {
+                if(*(cmdline+j) != ' ')
+                {
+                    int after_white_space = j;
+                    i = after_white_space;
+                    break;
+                }
+            }
             argc++;
         }
     }
@@ -89,7 +101,7 @@ push_command(const char *cmdline UNUSED, void **esp)
     void *argv_addr[argc];
     char arguments[argc][20];
     
-    /*Put the arguments into a string array or double char array*/
+    /* Put the arguments into a string array or double char array */
     int parse = 0;
     for(int i=0,j=0;i<=(int)strlen(cmdline);i++)
     {
@@ -101,26 +113,36 @@ push_command(const char *cmdline UNUSED, void **esp)
             arguments[j][arg_length] = '\0'; 
         }
         else if (*(cmdline + i) == ' ')
-        {
+        {   
             int arg_length = i-parse;
             memcpy(arguments[j], &cmdline[parse], arg_length);
             
+            /* Get the index of the next character that is not whitespace
+             * and set it to variable i */
+            for(int k=i+1;k<=(int)strlen(cmdline);k++)
+            {
+                if(*(cmdline + k) != ' ')
+                {
+                    int after_white_space = k;
+                    i = after_white_space;
+                    break;
+                }
+            }
+            
             arguments[j][arg_length] = '\0'; 
             j++;
-            parse = i + 1;
+            parse = i;
         }
     }
     
-    // Print out the arguments
+    /* Set *esp to the arguments */
     for(int i=argc-1;i>=0;i--)
     {
         int arg_length = strlen(arguments[i])+1;
         *esp -= arg_length;
         argv_addr[i] = *esp;
         memcpy(*esp, arguments[i], arg_length);
-        
-        //printf("Argument Address: 0x%08x\n", (unsigned int) *esp);
-        
+           
 //        for(int i=0;i<arg_length;i++)
 //        {
 //            printf("Character: %c\n", *(((char*) *esp) + i));
@@ -133,78 +155,31 @@ push_command(const char *cmdline UNUSED, void **esp)
         *esp = (void*) ((unsigned int) (*esp) & 0xfffffffc);
         
     }
-    
-    //printf("Memory Align Address: 0x%08x\n", (unsigned int) *esp);
      
-    // Set NULL Sentinel
+    /* Set NULL Sentinel */
     *esp -= 4;
     *((uint32_t*) *esp) = 0;
     
-    //printf("Address After Null Sentinel: 0x%08x\n", (unsigned int) *esp);
-    
-    // Set argv to point at addresses
+    /* Set argv to point at addresses */
     for(int i=argc-1;i>=0;i--)
     {
         *esp -= 4;
         *((void**) *esp) = argv_addr[i];
-        
-//        printf("\n");
-//        printf("Reference address: 0x%08x\n", (unsigned int) argv_addr[i]);
-//        printf("\n");
-//        
-//        printf("Address of Pointer to Argument: 0x%08x\n", (unsigned int) *esp);
-        //printf("Address: 0x%08x\n", (unsigned int) *esp);
     }
     
-    // Set argv to point at the beginning of argv[]
+    /* Set argv to point at the beginning of argv[] */
     *esp -= 4;
     *((void**) *esp) = (*esp + 4);
     
-    //printf("Address After Pointer to argv: 0x%08x\n", (unsigned int) *esp);
-    
-    // Set argc
+    /* Set argc */
     *esp -= 4;
     *((int*) *esp) = argc;
     
-    //printf("Address After Setting Argc: 0x%08x\n", (unsigned int) *esp);
-    
-    // Set return address
+    /* Set return address */
     *esp -= 4;
      *((int*) *esp) = 0;
      
-    //printf("Address After Return: 0x%08x\n", (unsigned int) *esp);
-    
-     
-    /*
-    int arg_length = strlen(cmdline)+1;
-    *esp -= arg_length;
-    memcpy(*esp, cmdline, arg_length);
-    argv_addr =  *esp;
-    
-    // Word align with the stack pointer. DO NOT REMOVE THIS LINE.
-    *esp = (void*) ((unsigned int) (*esp) & 0xfffffffc);
-    
-    // NULL Sentinel
-    *esp -= 4;
-    *((uint32_t*) *esp) = 0;
-    
-    // Set **esp with argv address
-    *esp -= 4;
-    *((void**) *esp) = argv_addr;
-    
-    // Set **argv
-    *esp -= 4;
-    *((void**) *esp) = (*esp + 4);
-    
-    // Set argc
-    *esp -= 4;
-    *((int*) *esp) = 1;
-    
-    // Set return addr
-    *esp -= 4;
-    *((int*) *esp) = 0;
-    */
-     
+      
     // Some of you CMPS111 Lab 3 code will go here.
     //
     // One approach is to immediately call a function you've created in a
@@ -242,6 +217,8 @@ process_execute(const char *cmdline)
     }
 #endif
     
+    
+    
     char *cmdline_copy = NULL;
     tid_t tid = TID_ERROR;
 
@@ -251,7 +228,12 @@ process_execute(const char *cmdline)
         return TID_ERROR;
     
     strlcpy(cmdline_copy, cmdline, PGSIZE);
-
+    
+    struct semaphore sema;
+    semaphore_init(&sema, 0);
+    
+    
+    
     /*Get the filename for the thread*/
     int file_length = 0;
     for(int i=0; i<=(int)strlen(cmdline); i++)
@@ -272,8 +254,10 @@ process_execute(const char *cmdline)
     
     // Create a Kernel Thread for the new process
     tid = thread_create(filename, PRI_DEFAULT, start_process, cmdline_copy);
-
+    
+    
     timer_msleep(10);
+    
 
     return tid;
 }
@@ -317,9 +301,9 @@ start_process(void *cmdline)
     success = load(filename, &pif.eip, &pif.esp);
     if (success) {
         push_command(cmdline, &pif.esp);
-    }
+    }    
     palloc_free_page(cmdline);
-
+    
     if (!success) {
         thread_exit();
     }
@@ -330,6 +314,8 @@ start_process(void *cmdline)
     // the form of a `struct intr_frame',  we just point the stack 
     // pointer (%esp) to our stack frame and jump to it.
     asm volatile ("movl %0, %%esp; jmp intr_exit" : : "g" (&pif) : "memory");
+    
+    
     NOT_REACHED();
 }
 

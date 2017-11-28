@@ -1,4 +1,4 @@
-TOTAL TESTING SCORE: 37.5%
+TOTAL TESTING SCORE: 42.5%
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -7,10 +7,10 @@ SUMMARY BY TEST SET
 Test Set                                      Pts Max  % Ttl  % Max
 --------------------------------------------- --- --- ------ ------
 tests/userprog/Rubric.process                   1/  1  30.0%/ 30.0%
-tests/userprog/Rubric.arguments                 3/  4   7.5%/ 10.0%
-tests/userprog/Rubric.systemcalls               0/ 16   0.0%/ 40.0%
+tests/userprog/Rubric.arguments                 4/  4  10.0%/ 10.0%
+tests/userprog/Rubric.systemcalls               1/ 16   2.5%/ 40.0%
 --------------------------------------------- --- --- ------ ------
-Total                                                  37.5%/ 80.0%
+Total                                                  42.5%/ 80.0%
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -29,18 +29,18 @@ Argument Passing (tests/userprog/Rubric.arguments):
 	     1/ 1 tests/userprog/args-single
 	     1/ 1 tests/userprog/args-multiple
 	     1/ 1 tests/userprog/args-many
-	  ** 0/ 1 tests/userprog/args-dbl-space
+	     1/ 1 tests/userprog/args-dbl-space
 
 	- Section summary.
-	      3/  4 tests passed
-	      3/  4 points subtotal
+	      4/  4 tests passed
+	      4/  4 points subtotal
 
 System Calls (tests/userprog/Rubric.systemcalls):
 
 	- "create" system call.
 	  ** 0/ 1 tests/userprog/create-empty
 	  ** 0/ 1 tests/userprog/create-long
-	  ** 0/ 1 tests/userprog/create-normal
+	     1/ 1 tests/userprog/create-normal
 	  ** 0/ 1 tests/userprog/create-exists
 
 	- "open" system call.
@@ -68,6 +68,6 @@ System Calls (tests/userprog/Rubric.systemcalls):
 	  ** 0/ 1 tests/userprog/wait-twice
 
 	- Section summary.
-	      0/ 16 tests passed
-	      0/ 16 points subtotal
+	      1/ 16 tests passed
+	      1/ 16 points subtotal
 

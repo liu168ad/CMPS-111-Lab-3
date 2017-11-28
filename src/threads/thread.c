@@ -44,8 +44,10 @@
 #include "threads/lock.h"
 #include "threads/semaphore.h"
 #include "threads/vaddr.h"
+
 #ifdef USERPROG
 #include "userprog/process.h"
+#include "userprog/utils.h"
 #endif
 
 // Random value for struct thread's `magic' member.
@@ -237,7 +239,7 @@ thread_create (const char *name, int priority,
   struct switch_entry_frame *ef;
   struct switch_threads_frame *sf;
   tid_t tid;
-
+  
   ASSERT (function != NULL);
 
   /* Allocate thread. */
@@ -245,8 +247,8 @@ thread_create (const char *name, int priority,
   if (t == NULL)
     return TID_ERROR;
 
-  /* Initialize thread. */
   init_thread (t, name, priority);
+  
   tid = t->tid = allocate_tid ();
 
   /* Stack frame for kernel_thread(). */
@@ -254,6 +256,7 @@ thread_create (const char *name, int priority,
   kf->eip = NULL;
   kf->function = function;
   kf->aux = aux;
+
 
   /* Stack frame for switch_entry(). */
   ef = alloc_frame (t, sizeof *ef);
@@ -274,7 +277,7 @@ thread_create (const char *name, int priority,
     // current thread releases off its running
     thread_yield();
   }
-
+  
   return tid;
 }
 
@@ -391,6 +394,8 @@ thread_exit (void)
   intr_disable ();
   list_remove (&thread_current()->allelem);
   thread_current ()->status = THREAD_DYING;
+  
+  
   schedule ();
   NOT_REACHED ();
 }

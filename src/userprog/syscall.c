@@ -48,11 +48,14 @@
 #include "userprog/syscall.h"
 #include "userprog/process.h"
 #include "userprog/umem.h"
+#include "userprog/utils.h"
 
 static void syscall_handler(struct intr_frame *);
 
 static void write_handler(struct intr_frame *);
 static void exit_handler(struct intr_frame *);
+
+static void create_handler(struct intr_frame *);
 
 void
 syscall_init (void)
@@ -72,24 +75,33 @@ syscall_handler(struct intr_frame *f)
   // Store the stack pointer esp, which is needed in the page fault handler.
   // Do NOT remove this line
   thread_current()->current_esp = f->esp;
-
+  
+//  printf("\n");
+//  printf("System call int: %d\n", syscall);
+//  printf("SYS_CREATE int: %d\n", SYS_CREATE);
+//  printf("\n");
+    
   switch (syscall) {
-  case SYS_HALT: 
-    shutdown_power_off();
-    break;
+    case SYS_HALT: 
+        shutdown_power_off();
+        break;
 
-  case SYS_EXIT: 
-    exit_handler(f);
-    break;
+    case SYS_EXIT: 
+        exit_handler(f);
+        break;
       
-  case SYS_WRITE: 
-    write_handler(f);
-    break;
-
-  default:
-    printf("[ERROR] system call %d is unimplemented!\n", syscall);
-    thread_exit();
-    break;
+    case SYS_WRITE: 
+        write_handler(f);
+        break;
+    
+    case SYS_CREATE:
+        create_handler(f);
+        break;
+    
+    default:
+        printf("[ERROR] system call %d is unimplemented!\n", syscall);
+        thread_exit();
+        break;
   }
 }
 
@@ -102,7 +114,7 @@ syscall_handler(struct intr_frame *f)
 // *****************************************************************
 
 void sys_exit(int status) 
-{
+{  
   printf("%s: exit(%d)\n", thread_current()->name, status);
   thread_exit();
 }
@@ -144,5 +156,11 @@ static void write_handler(struct intr_frame *f)
     umem_read(f->esp + 12, &size, sizeof(size));
 
     f->eax = sys_write(fd, buffer, size);
+}
+
+static void create_handler(struct intr_frame *f)
+{
+    f->eax = true;
+    //printf("In create_handler\n");
 }
 

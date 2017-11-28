@@ -1,12 +1,12 @@
 Copying tests/userprog/create-normal to scratch partition...
-qemu-system-i386 -device isa-debug-exit -hda /tmp/pNrdDMo3Sx.dsk -m 4 -net none -nographic -monitor null
+qemu-system-i386 -device isa-debug-exit -hda /tmp/w9XzTG1yfv.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading............
 Kernel command line: -q -f extract run create-normal
 Pintos booting with 3,968 kB RAM...
 367 pages available in kernel pool.
 367 pages available in user pool.
-Calibrating timer...  425,984,000 loops/s.
+Calibrating timer...  209,510,400 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
 hda1: 193 sectors (96 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
@@ -21,13 +21,14 @@ Erasing ustar archive...
 Executing 'create-normal':
 (create-normal) begin
 (create-normal) create quux.dat
-[ERROR] system call 4 is unimplemented!
+(create-normal) end
+create-normal: exit(0)
 Execution of 'create-normal' complete.
-Timer: 90 ticks
-Thread: 30 idle ticks, 59 kernel ticks, 1 user ticks
+Timer: 75 ticks
+Thread: 30 idle ticks, 45 kernel ticks, 0 user ticks
 hda2 (filesys): 216 reads, 189 writes
 hda3 (scratch): 94 reads, 2 writes
-Console: 942 characters output
+Console: 945 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
