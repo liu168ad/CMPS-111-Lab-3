@@ -45,6 +45,7 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "threads/vaddr.h"
+#include "threads/lock.h"
 #include "userprog/syscall.h"
 #include "userprog/process.h"
 #include "userprog/umem.h"
@@ -57,9 +58,12 @@ static void exit_handler(struct intr_frame *);
 
 static void create_handler(struct intr_frame *);
 
+struct lock fs_lock;
+
 void
 syscall_init (void)
 {
+  lock_init(&fs_lock);
   intr_register_int (0x30, 3, INTR_ON, syscall_handler, "syscall");
 }
 
@@ -75,12 +79,7 @@ syscall_handler(struct intr_frame *f)
   // Store the stack pointer esp, which is needed in the page fault handler.
   // Do NOT remove this line
   thread_current()->current_esp = f->esp;
-  
-//  printf("\n");
-//  printf("System call int: %d\n", syscall);
-//  printf("SYS_CREATE int: %d\n", SYS_CREATE);
-//  printf("\n");
-    
+      
   switch (syscall) {
     case SYS_HALT: 
         shutdown_power_off();
@@ -95,7 +94,9 @@ syscall_handler(struct intr_frame *f)
         break;
     
     case SYS_CREATE:
+        lock_acquire(&fs_lock);
         create_handler(f);
+        lock_release(&fs_lock);
         break;
     
     default:
@@ -115,21 +116,7 @@ syscall_handler(struct intr_frame *f)
 
 void sys_exit(int status) 
 {  
-  printf("%s: exit(%d)\n", thread_current()->name, status);
-  
-//  struct thread *parent = thread_current()->parent;
-//  struct list_elem *e;
-//  for (e = list_begin (&parent->child_list); e != list_end (&parent->child_list);
-//      e = list_next (e))
-//    {
-//        struct thread *child = list_entry (e, struct thread, child_elem);
-//
-//        if(thread_current() == child)
-//        {
-//            semaphore_up(&parent->wait_on_child);
-//        }
-//    }
-  
+  printf("%s: exit(%d)\n", thread_current()->name, status);  
   thread_exit();
 }
 
@@ -172,8 +159,21 @@ static void write_handler(struct intr_frame *f)
     f->eax = sys_write(fd, buffer, size);
 }
 
+
+static uint32_t sys_create(const char* file, unsigned size)
+{
+    bool success = filesys_create(file, size, false);
+    return success;
+}
+
 static void create_handler(struct intr_frame *f)
 {
-    f->eax = true;
+    const char *file;
+    unsigned size;
+    
+    umem_read(f->esp + 4, &file, sizeof(file));
+    umem_read(f->esp + 8, &size, sizeof(size));
+    
+    f->eax = sys_create(file, size);
 }
 
