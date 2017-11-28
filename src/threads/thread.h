@@ -132,10 +132,14 @@ struct thread
     struct list_elem waitelem;  // List element, stored in the wait_list queue 
     int64_t sleep_endtick;      // The tick after which the thread should wakeup 
     
-    void *aux;
-
-    // Shared between thread.c and smeaphore.c. 
-    struct list_elem elem;      // List element for the semaphore wiaitng list or the global ready_list
+    struct semaphore wait_on_child; // Semaphore for blocking Parent process
+    struct list child_list;         // List store all children processes
+    struct list_elem child_elem;    // List element for the child list
+    
+    struct thread *parent;           // Reference to the parent thread
+    
+    // Shared between thread.c and semaphore.c. 
+    struct list_elem elem;      // List element for the semaphore waiting list or the global ready_list
 
     // Owned by userprog/process.c. 
     uint32_t *pagedir;     // Pointer to the page directory

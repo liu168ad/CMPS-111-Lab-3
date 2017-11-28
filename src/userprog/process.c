@@ -217,8 +217,6 @@ process_execute(const char *cmdline)
     }
 #endif
     
-    
-    
     char *cmdline_copy = NULL;
     tid_t tid = TID_ERROR;
 
@@ -228,11 +226,6 @@ process_execute(const char *cmdline)
         return TID_ERROR;
     
     strlcpy(cmdline_copy, cmdline, PGSIZE);
-    
-    struct semaphore sema;
-    semaphore_init(&sema, 0);
-    
-    
     
     /*Get the filename for the thread*/
     int file_length = 0;
@@ -255,10 +248,10 @@ process_execute(const char *cmdline)
     // Create a Kernel Thread for the new process
     tid = thread_create(filename, PRI_DEFAULT, start_process, cmdline_copy);
     
+    semaphore_down(&thread_current()->wait_on_child);
     
-    timer_msleep(10);
+    //timer_msleep(10);
     
-
     return tid;
 }
 
@@ -270,6 +263,9 @@ process_execute(const char *cmdline)
 static void
 start_process(void *cmdline)
 {
+    struct thread *parent = thread_current()->parent;
+    list_push_back(&parent->child_list, &thread_current()->child_elem);
+    
     bool success = false;
     
     /*Get the filename for the thread*/
@@ -304,6 +300,8 @@ start_process(void *cmdline)
     }    
     palloc_free_page(cmdline);
     
+    semaphore_up(&thread_current()->parent->wait_on_child);
+    
     if (!success) {
         thread_exit();
     }
@@ -330,7 +328,22 @@ start_process(void *cmdline)
    For now, it does nothing. */
 int
 process_wait(tid_t child_tid UNUSED)
-{
+{   
+    
+//    struct thread *current = thread_current();
+//    struct list_elem *e;
+//    for (e = list_begin (&current->child_list); e != list_end (&current->child_list);
+//         e = list_next (e))
+//      {
+//        struct thread *child = list_entry (e, struct thread, child_elem);
+//        
+//        if(child->tid == child_tid)
+//        {
+//            list_remove(e); // Remove child from parent's child_list
+//            return child_tid;
+//        }
+//      }
+    
     return -1;
 }
 

@@ -10,23 +10,22 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/pintos/pintos/src/userprog/process.h</file>
             <file>file:/home/pintos/pintos/src/lib/user/syscall.c</file>
             <file>file:/home/pintos/pintos/src/threads/interrupt.h</file>
             <file>file:/home/pintos/pintos/src/filesys/file.c</file>
             <file>file:/home/pintos/pintos/src/threads/interrupt.c</file>
             <file>file:/home/pintos/pintos/src/userprog/utils.h</file>
             <file>file:/home/pintos/pintos/src/threads/init.c</file>
-            <file>file:/home/pintos/pintos/src/lib/string.c</file>
             <file>file:/home/pintos/pintos/src/userprog/process.c</file>
             <file>file:/home/pintos/pintos/src/threads/thread.h</file>
             <file>file:/home/pintos/pintos/src/filesys/filesys.h</file>
             <file>file:/home/pintos/pintos/src/threads/thread.c</file>
-            <file>file:/home/pintos/pintos/src/userprog/syscall.h</file>
-            <file>file:/home/pintos/pintos/src/threads/semaphore.h</file>
-            <file>file:/home/pintos/pintos/src/lib/debug.h</file>
+            <file>file:/home/pintos/pintos/src/lib/kernel/list.h</file>
+            <file>file:/home/pintos/pintos/src/lib/kernel/list.c</file>
             <file>file:/home/pintos/pintos/src/userprog/syscall.c</file>
             <file>file:/home/pintos/pintos/src/threads/semaphore.c</file>
-            <file>file:/home/pintos/pintos/src/lib/kernel/list.c</file>
+            <file>file:/home/pintos/pintos/src/tests/userprog/create-empty.c</file>
         </group>
     </open-files>
 </project-private>

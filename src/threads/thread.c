@@ -248,6 +248,7 @@ thread_create (const char *name, int priority,
     return TID_ERROR;
 
   init_thread (t, name, priority);
+  t->parent = thread_current();
   
   tid = t->tid = allocate_tid ();
 
@@ -567,6 +568,10 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
+  
+  semaphore_init(&t->wait_on_child, 0);
+  list_init(&t->child_list);
+  
   t->sleep_endtick = 0;
   t->magic = THREAD_MAGIC;
 

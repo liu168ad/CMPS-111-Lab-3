@@ -116,6 +116,20 @@ syscall_handler(struct intr_frame *f)
 void sys_exit(int status) 
 {  
   printf("%s: exit(%d)\n", thread_current()->name, status);
+  
+//  struct thread *parent = thread_current()->parent;
+//  struct list_elem *e;
+//  for (e = list_begin (&parent->child_list); e != list_end (&parent->child_list);
+//      e = list_next (e))
+//    {
+//        struct thread *child = list_entry (e, struct thread, child_elem);
+//
+//        if(thread_current() == child)
+//        {
+//            semaphore_up(&parent->wait_on_child);
+//        }
+//    }
+  
   thread_exit();
 }
 
@@ -161,6 +175,5 @@ static void write_handler(struct intr_frame *f)
 static void create_handler(struct intr_frame *f)
 {
     f->eax = true;
-    //printf("In create_handler\n");
 }
 
