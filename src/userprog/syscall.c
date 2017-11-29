@@ -123,9 +123,10 @@ syscall_handler(struct intr_frame *f)
         
     case SYS_CLOSE:
         lock_acquire(&fs_lock);
-        //close_handler(f);
+        close_handler(f);
         lock_release(&fs_lock);
         break;
+        
     
     default:
         printf("[ERROR] system call %d is unimplemented!\n", syscall);
@@ -164,14 +165,38 @@ static uint32_t sys_write(int fd, const void *buffer, unsigned size)
   umem_check((const uint8_t*) buffer);
   umem_check((const uint8_t*) buffer + size - 1);
 
-  int ret = -1;
+  int bytes_written = -1;
 
-  if (fd == 1) { // write to stdout
+  if (fd == 1) // write to stdout
+  { 
     putbuf(buffer, size);
-    ret = size;
+    bytes_written = size;
+  }
+  else
+  {
+    lock_acquire(&fs_lock);  
+      
+    struct thread *current = thread_current();
+    
+    struct list_elem *e;
+    for (e = list_begin (&current->file_list); e != list_end (&current->file_list);
+         e = list_next (e))
+      {
+        struct file *f = list_entry (e, struct file, file_elem);
+        
+        if(f->fd == fd)
+        {               
+            bytes_written = file_write(f, buffer, size);
+            break;
+        }
+      }
+    
+    return bytes_written;
+    
+    lock_release(&fs_lock);
   }
 
-  return (uint32_t) ret;
+  return (uint32_t) bytes_written;
 }
 
 static void write_handler(struct intr_frame *f)
@@ -210,7 +235,7 @@ static uint32_t sys_open(const char* file)
     struct file *f = filesys_open(file);
      
     if(f != NULL)
-    {
+    {        
         f->fd = thread_current()->fd;
         thread_current()->fd++;
         list_push_back(&thread_current()->file_list, &f->file_elem);
@@ -231,7 +256,7 @@ static void open_handler(struct intr_frame *f)
     f->eax = sys_open(file);
 }
 
-static uint32_t sys_read(int fd, const void *buffer, unsigned size)
+static uint32_t sys_read(int fd, void *buffer, unsigned size)
 {
   umem_check((const uint8_t*) buffer);
   umem_check((const uint8_t*) buffer + size - 1);
@@ -257,7 +282,7 @@ static uint32_t sys_read(int fd, const void *buffer, unsigned size)
 static void read_handler(struct intr_frame *f)
 {
     int fd;
-    const char *buffer;
+    char *buffer;
     unsigned size;
     
     umem_read(f->esp + 4, &fd, sizeof(fd));
@@ -307,11 +332,13 @@ static void sys_close(int fd)
         struct file *f = list_entry (e, struct file, file_elem);
         
         if(f->fd == fd)
-        {   
+        {               
+            list_remove(&f->file_elem);
             file_close(f);
-            //list_remove(e);
+            break;
         }
       }
+    
 }
 
 static void close_handler(struct intr_frame *f)
