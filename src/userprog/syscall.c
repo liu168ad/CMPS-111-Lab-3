@@ -205,24 +205,16 @@ static void create_handler(struct intr_frame *f)
     f->eax = sys_create(file, size);
 }
 
-int add_file(struct file *f)
-{
-    f->fd = thread_current()->fd;
-    thread_current()->fd++;
-
-    list_push_back(&thread_current()->file_list, &f->file_elem);
- 
-    return f->fd;
-}
-
 static uint32_t sys_open(const char* file)
 {
     struct file *f = filesys_open(file);
      
     if(f != NULL)
     {
-        int fd = add_file(f);
-        return fd;
+        f->fd = thread_current()->fd;
+        thread_current()->fd++;
+        list_push_back(&thread_current()->file_list, &f->file_elem);
+        return f->fd;
     }
     else
     {
