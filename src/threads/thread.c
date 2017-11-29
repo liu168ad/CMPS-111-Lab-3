@@ -572,6 +572,9 @@ init_thread (struct thread *t, const char *name, int priority)
   semaphore_init(&t->wait_on_child, 0);
   list_init(&t->child_list);
   
+  t->fd = 2;
+  list_init(&t->file_list);
+  
   t->sleep_endtick = 0;
   t->magic = THREAD_MAGIC;
 

@@ -340,7 +340,6 @@ process_wait(tid_t child_tid UNUSED)
 //        if(child->tid == child_tid)
 //        {
 //            list_remove(e); // Remove child from parent's child_list
-//            return child_tid;
 //        }
 //      }
     

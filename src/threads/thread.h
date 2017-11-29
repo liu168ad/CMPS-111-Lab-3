@@ -135,8 +135,10 @@ struct thread
     struct semaphore wait_on_child; // Semaphore for blocking Parent process
     struct list child_list;         // List store all children processes
     struct list_elem child_elem;    // List element for the child list
+    struct thread *parent;          // Reference to the parent thread
     
-    struct thread *parent;           // Reference to the parent thread
+    int fd;                     // File descriptor
+    struct list file_list;      // List to store files
     
     // Shared between thread.c and semaphore.c. 
     struct list_elem elem;      // List element for the semaphore waiting list or the global ready_list

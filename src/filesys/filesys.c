@@ -90,7 +90,7 @@ filesys_open (const char *name)
   split_path_filename(name, directory, file_name);
   struct dir *dir = dir_open_path (directory);
   struct inode *inode = NULL;
-
+  
   // removed directory handling
   if (dir == NULL) return NULL;
 
@@ -105,7 +105,7 @@ filesys_open (const char *name)
   // removed file handling
   if (inode == NULL || inode_is_removed (inode))
     return NULL;
-
+  
   return file_open (inode);
 }
 

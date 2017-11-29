@@ -57,6 +57,8 @@ static void write_handler(struct intr_frame *);
 static void exit_handler(struct intr_frame *);
 
 static void create_handler(struct intr_frame *);
+static void open_handler(struct intr_frame *);
+static void read_handler(struct intr_frame *);
 
 struct lock fs_lock;
 
@@ -98,6 +100,19 @@ syscall_handler(struct intr_frame *f)
         create_handler(f);
         lock_release(&fs_lock);
         break;
+        
+    case SYS_OPEN:
+        lock_acquire(&fs_lock);
+        open_handler(f);
+        lock_release(&fs_lock);
+        break;
+        
+    case SYS_READ:
+        lock_acquire(&fs_lock);
+        read_handler(f);
+        lock_release(&fs_lock);
+        break;
+          
     
     default:
         printf("[ERROR] system call %d is unimplemented!\n", syscall);
@@ -176,4 +191,62 @@ static void create_handler(struct intr_frame *f)
     
     f->eax = sys_create(file, size);
 }
+
+int add_file(struct file *f)
+{
+    f->fd = thread_current()->fd;
+    thread_current()->fd++;
+
+    list_push_back(&thread_current()->file_list, &f->file_elem);
+ 
+    return f->fd;
+}
+
+static uint32_t sys_open(const char* file)
+{
+    struct file *f = filesys_open(file);
+     
+    if(f != NULL)
+    {
+        int fd = add_file(f);
+        return fd;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+static void open_handler(struct intr_frame *f)
+{   
+    const char *file;
+    
+    umem_read(f->esp + 4, &file, sizeof(file));
+    
+    f->eax = sys_open(file);
+}
+
+static uint32_t sys_read(int fd, const void *buffer, unsigned size)
+{
+  umem_check((const uint8_t*) buffer);
+  umem_check((const uint8_t*) buffer + size - 1);
+
+  
+
+  return -1;
+}
+
+static void read_handler(struct intr_frame *f)
+{
+    int fd;
+    const char *buffer;
+    unsigned size;
+    
+    umem_read(f->esp + 4, &fd, sizeof(fd));
+    umem_read(f->esp + 8, &buffer, sizeof(buffer));
+    umem_read(f->esp + 12, &size, sizeof(size));
+    
+    f->eax = sys_read(fd, buffer, size);
+}
+
 

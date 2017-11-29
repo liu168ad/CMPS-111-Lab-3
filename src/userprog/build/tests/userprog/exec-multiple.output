@@ -1,15 +1,15 @@
 Copying tests/userprog/exec-multiple to scratch partition...
 Copying tests/userprog/child-simple to scratch partition...
-qemu-system-i386 -device isa-debug-exit -hda /tmp/oWOwYaVR1q.dsk -m 4 -net none -nographic -monitor null
+qemu-system-i386 -device isa-debug-exit -hda /tmp/S2fbCfQFLm.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading............
 Kernel command line: -q -f extract run exec-multiple
 Pintos booting with 3,968 kB RAM...
 367 pages available in kernel pool.
 367 pages available in user pool.
-Calibrating timer...  439,091,200 loops/s.
+Calibrating timer...  418,201,600 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
-hda1: 193 sectors (96 kB), Pintos OS kernel (20)
+hda1: 201 sectors (100 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
 hda3: 186 sectors (93 kB), Pintos scratch (22)
 filesys: using hda2
@@ -24,11 +24,11 @@ Executing 'exec-multiple':
 (exec-multiple) begin
 [ERROR] system call 2 is unimplemented!
 Execution of 'exec-multiple' complete.
-Timer: 94 ticks
-Thread: 30 idle ticks, 63 kernel ticks, 1 user ticks
+Timer: 83 ticks
+Thread: 30 idle ticks, 52 kernel ticks, 1 user ticks
 hda2 (filesys): 401 reads, 372 writes
 hda3 (scratch): 185 reads, 2 writes
-Console: 959 characters output
+Console: 960 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

@@ -1,14 +1,14 @@
 Copying tests/userprog/create-exists to scratch partition...
-qemu-system-i386 -device isa-debug-exit -hda /tmp/qDo3ZSlIco.dsk -m 4 -net none -nographic -monitor null
+qemu-system-i386 -device isa-debug-exit -hda /tmp/ykf2O0KaDr.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading............
 Kernel command line: -q -f extract run create-exists
 Pintos booting with 3,968 kB RAM...
 367 pages available in kernel pool.
 367 pages available in user pool.
-Calibrating timer...  366,592,000 loops/s.
+Calibrating timer...  157,081,600 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
-hda1: 193 sectors (96 kB), Pintos OS kernel (20)
+hda1: 201 sectors (100 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
 hda3: 95 sectors (47 kB), Pintos scratch (22)
 filesys: using hda2
@@ -29,10 +29,10 @@ Executing 'create-exists':
 create-exists: exit(0)
 Execution of 'create-exists' complete.
 Timer: 83 ticks
-Thread: 30 idle ticks, 52 kernel ticks, 2 user ticks
+Thread: 30 idle ticks, 50 kernel ticks, 3 user ticks
 hda2 (filesys): 222 reads, 195 writes
 hda3 (scratch): 94 reads, 2 writes
-Console: 1097 characters output
+Console: 1098 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
