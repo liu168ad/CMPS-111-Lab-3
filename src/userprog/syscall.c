@@ -59,6 +59,8 @@ static void exit_handler(struct intr_frame *);
 static void create_handler(struct intr_frame *);
 static void open_handler(struct intr_frame *);
 static void read_handler(struct intr_frame *);
+static void filesize_handler(struct intr_frame *);
+static void close_handler(struct intr_frame *);
 
 struct lock fs_lock;
 
@@ -113,6 +115,17 @@ syscall_handler(struct intr_frame *f)
         lock_release(&fs_lock);
         break;
           
+    case SYS_FILESIZE:
+        lock_acquire(&fs_lock);
+        filesize_handler(f);
+        lock_release(&fs_lock);
+        break;
+        
+    case SYS_CLOSE:
+        lock_acquire(&fs_lock);
+        //close_handler(f);
+        lock_release(&fs_lock);
+        break;
     
     default:
         printf("[ERROR] system call %d is unimplemented!\n", syscall);
@@ -230,10 +243,23 @@ static uint32_t sys_read(int fd, const void *buffer, unsigned size)
 {
   umem_check((const uint8_t*) buffer);
   umem_check((const uint8_t*) buffer + size - 1);
-
+    
+  struct thread *current = thread_current();
+  uint32_t bytes_read = 0;
   
-
-  return -1;
+  struct list_elem *e;
+  for (e = list_begin (&current->file_list); e != list_end (&current->file_list);
+         e = list_next (e))
+      {
+        struct file *f = list_entry (e, struct file, file_elem);
+        
+        if(f->fd == fd)
+        {   
+            bytes_read = file_read(f, buffer, size);
+        }
+      }
+  
+  return bytes_read;
 }
 
 static void read_handler(struct intr_frame *f)
@@ -249,4 +275,58 @@ static void read_handler(struct intr_frame *f)
     f->eax = sys_read(fd, buffer, size);
 }
 
+static uint32_t sys_filesize(int fd)
+{
+    uint32_t file_size = 0;
+    struct thread *current = thread_current();
+    
+    struct list_elem *e;
+    for (e = list_begin (&current->file_list); e != list_end (&current->file_list);
+         e = list_next (e))
+      {
+        struct file *f = list_entry (e, struct file, file_elem);
+        
+        if(f->fd == fd)
+        {            
+            file_size = file_length(f);
+        }
+      }
+    
+    return file_size;
+}
 
+static void filesize_handler(struct intr_frame *f)
+{   
+    int fd;
+    
+    umem_read(f->esp + 4, &fd, sizeof(fd));
+    
+    f->eax = sys_filesize(fd);
+}
+
+static void sys_close(int fd)
+{
+    struct thread *current = thread_current();
+    
+    struct list_elem *e;
+    for (e = list_begin (&current->file_list); e != list_end (&current->file_list);
+         e = list_next (e))
+      {
+        struct file *f = list_entry (e, struct file, file_elem);
+        
+        if(f->fd == fd)
+        {   
+            file_close(f);
+            //list_remove(e);
+        }
+      }
+}
+
+static void close_handler(struct intr_frame *f)
+{   
+    int fd;
+    
+    umem_read(f->esp + 4, &fd, sizeof(fd));
+    
+    sys_close(fd);
+}
