@@ -140,6 +140,8 @@ struct thread
     int fd;                     // File descriptor
     struct list file_list;      // List to store files
     
+    int exit_status;
+    
     // Shared between thread.c and semaphore.c. 
     struct list_elem elem;      // List element for the semaphore waiting list or the global ready_list
 
@@ -191,5 +193,9 @@ int thread_get_nice(void);
 void thread_set_nice(int);
 int thread_get_recent_cpu(void);
 int thread_get_load_avg(void);
+
+int get_ready_list_size(void);
+
+struct list get_ready_list(void);
 
 #endif // threads/thread.h 

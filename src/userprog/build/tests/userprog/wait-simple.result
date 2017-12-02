@@ -10,9 +10,9 @@ Acceptable output:
   wait-simple: exit(0)
 Differences in `diff -u' format:
   (wait-simple) begin
-- (child-simple) run
-- child-simple: exit(81)
+  (child-simple) run
+  child-simple: exit(81)
 - (wait-simple) wait(exec()) = 81
-- (wait-simple) end
-- wait-simple: exit(0)
-+ [ERROR] system call 2 is unimplemented!
++ (wait-simple) wait(exec()) = 256
+  (wait-simple) end
+  wait-simple: exit(0)

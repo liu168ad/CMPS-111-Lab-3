@@ -245,12 +245,25 @@ process_execute(const char *cmdline)
     memcpy(filename, cmdline, file_length);
     filename[file_length] = '\0';
     
+    /*This semaphore is only used to load the chil's arguments in*/
+    struct aux a;
+    a.cmdline_copy = cmdline_copy;
+    a.parent = thread_current();
+    semaphore_init(&a.sema, 0);
+    
+//    if(strcmp(thread_current()->name, "main") !=0 )
+//    {
+//        struct thread *parent = thread_current()->parent;
+//        list_push_back(&parent->child_list, &thread_current()->child_elem);
+//    }
+    
+    //cmdline_copy
     // Create a Kernel Thread for the new process
-    tid = thread_create(filename, PRI_DEFAULT, start_process, cmdline_copy);
+    tid = thread_create(filename, PRI_DEFAULT, start_process, &a);
     
-    semaphore_down(&thread_current()->wait_on_child);
+    semaphore_down(&a.sema);
     
-    //timer_msleep(10);
+    //timer_msleep(200);
     
     return tid;
 }
@@ -261,16 +274,19 @@ process_execute(const char *cmdline)
  * If arguments are passed in CMDLINE, the thread will exit imediately.
  */
 static void
-start_process(void *cmdline)
-{
-    struct thread *parent = thread_current()->parent;
-    list_push_back(&parent->child_list, &thread_current()->child_elem);
-    
+start_process(void *aux)
+{   
     bool success = false;
+    
+    struct aux *a = (struct aux *)aux;
+    struct thread *parent = a->parent;
+    
+    thread_current()->parent = parent;
+    list_push_back(&parent->child_list, &thread_current()->child_elem);
     
     /*Get the filename for the thread*/
     int file_length = 0;
-    const char *cmdtemp = (char *) cmdline;
+    char *cmdtemp = a->cmdline_copy;
     for(int i=0; i<=(int)strlen(cmdtemp); i++)
     {           
         if(*(cmdtemp + i) == '\0')
@@ -296,11 +312,11 @@ start_process(void *cmdline)
     pif.eflags = FLAG_IF | FLAG_MBS;
     success = load(filename, &pif.eip, &pif.esp);
     if (success) {
-        push_command(cmdline, &pif.esp);
+        push_command(a->cmdline_copy, &pif.esp);
     }    
-    palloc_free_page(cmdline);
+    palloc_free_page(a->cmdline_copy);
     
-    semaphore_up(&thread_current()->parent->wait_on_child);
+    semaphore_up(&a->sema);
     
     if (!success) {
         thread_exit();
@@ -327,23 +343,39 @@ start_process(void *cmdline)
    This function will be implemented in Lab 3.  
    For now, it does nothing. */
 int
-process_wait(tid_t child_tid UNUSED)
-{   
+process_wait(tid_t child_tid)
+{       
+    struct thread *current = thread_current();
     
-//    struct thread *current = thread_current();
-//    struct list_elem *e;
-//    for (e = list_begin (&current->child_list); e != list_end (&current->child_list);
-//         e = list_next (e))
-//      {
-//        struct thread *child = list_entry (e, struct thread, child_elem);
-//        
-//        if(child->tid == child_tid)
-//        {
-//            list_remove(e); // Remove child from parent's child_list
-//        }
-//      }
+    struct list_elem *e;
     
-    return -1;
+    struct thread *save_child = NULL;
+    
+    for (e = list_begin (&current->child_list); e != list_end (&current->child_list);
+         e = list_next (e))
+      {
+        struct thread *child = list_entry (e, struct thread, child_elem);
+        
+        if(child->tid == child_tid)
+        {
+            save_child = child;
+        }
+      }
+    
+    if(save_child != NULL) //child has not finished yet
+    {
+        if(save_child->exit_status == -999)
+        {
+            //printf("Semaphore down\n");
+            semaphore_down(&thread_current()->wait_on_child);
+        }
+        
+        return -1;
+    }
+    else 
+    {
+        return 0;
+    }
 }
 
 /* Free the current process's resources. */

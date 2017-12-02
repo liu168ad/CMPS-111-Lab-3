@@ -20,7 +20,7 @@ struct aux
 {
     char *cmdline_copy;
     struct semaphore sema;
-    bool initialized;
+    struct thread *parent;
 };
 
 

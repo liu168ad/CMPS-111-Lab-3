@@ -61,6 +61,9 @@ static void open_handler(struct intr_frame *);
 static void read_handler(struct intr_frame *);
 static void filesize_handler(struct intr_frame *);
 static void close_handler(struct intr_frame *);
+static void exec_handler(struct intr_frame *);
+static void wait_handler(struct intr_frame *);
+
 
 struct lock fs_lock;
 
@@ -126,8 +129,19 @@ syscall_handler(struct intr_frame *f)
         close_handler(f);
         lock_release(&fs_lock);
         break;
-        
     
+    case SYS_EXEC:
+        lock_acquire(&fs_lock);
+        exec_handler(f);
+        lock_release(&fs_lock);
+        break;
+      
+    case SYS_WAIT:
+        lock_acquire(&fs_lock);
+        wait_handler(f);
+        lock_release(&fs_lock);
+        break;
+
     default:
         printf("[ERROR] system call %d is unimplemented!\n", syscall);
         thread_exit();
@@ -145,12 +159,22 @@ syscall_handler(struct intr_frame *f)
 
 void sys_exit(int status) 
 {  
+//    printf("\n");
+//    printf("PARENT THREAD: %s\n", thread_current()->parent->name);
+//    printf("CURRENT THREAD: %s\n", thread_current()->name);
+//    printf("STATUS: %d\n", status);
+//    printf("\n");
+    
+  thread_current()->exit_status = status;
+  semaphore_up(&thread_current()->parent->wait_on_child);
+  list_remove(&thread_current()->child_elem);
+  
   printf("%s: exit(%d)\n", thread_current()->name, status);  
   thread_exit();
 }
 
 static void exit_handler(struct intr_frame *f) 
-{
+{   
   int exitcode;
   umem_read(f->esp + 4, &exitcode, sizeof(exitcode));
 
@@ -348,4 +372,39 @@ static void close_handler(struct intr_frame *f)
     umem_read(f->esp + 4, &fd, sizeof(fd));
     
     sys_close(fd);
+}
+
+static uint32_t sys_exec(const char *file)
+{   
+//    printf("Calling sys_exec\n");
+//    printf("Current thread is sys_exec: %s\n", thread_current()->name);
+    
+    int tid = process_execute(file);
+    return tid;
+}
+
+static void exec_handler(struct intr_frame *f)
+{   
+    const char *file;
+    
+    umem_read(f->esp + 4, &file, sizeof(file));
+    
+    sys_exec(file);
+}
+
+static uint32_t sys_wait(int pid)
+{
+    // sys_wait is called
+    int success = process_wait(pid);
+    
+    return success;
+}
+
+static void wait_handler(struct intr_frame *f)
+{   
+    int pid;
+    
+    umem_read(f->esp + 4, &pid, sizeof(pid));
+    
+    sys_wait(pid);
 }

@@ -248,7 +248,6 @@ thread_create (const char *name, int priority,
     return TID_ERROR;
 
   init_thread (t, name, priority);
-  t->parent = thread_current();
   
   tid = t->tid = allocate_tid ();
 
@@ -569,6 +568,8 @@ init_thread (struct thread *t, const char *name, int priority)
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
   
+  t->exit_status = -999;
+  
   semaphore_init(&t->wait_on_child, 0);
   list_init(&t->child_list);
   
@@ -706,6 +707,15 @@ comparator_greater_thread_priority (
   return ta->priority > tb->priority;
 }
 
+int get_ready_list_size(void)
+{
+    return (int) list_size(&ready_list);
+}
+
+struct list get_ready_list(void)
+{
+    return ready_list;
+}
 
 /* Offset of `stack' member within `struct thread'.
    Used by switch.S, which can't figure it out on its own. */

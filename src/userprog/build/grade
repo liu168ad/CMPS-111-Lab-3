@@ -1,4 +1,4 @@
-TOTAL TESTING SCORE: 70.0%
+TOTAL TESTING SCORE: 75.0%
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -8,9 +8,9 @@ Test Set                                      Pts Max  % Ttl  % Max
 --------------------------------------------- --- --- ------ ------
 tests/userprog/Rubric.process                   1/  1  30.0%/ 30.0%
 tests/userprog/Rubric.arguments                 4/  4  10.0%/ 10.0%
-tests/userprog/Rubric.systemcalls              12/ 16  30.0%/ 40.0%
+tests/userprog/Rubric.systemcalls              14/ 16  35.0%/ 40.0%
 --------------------------------------------- --- --- ------ ------
-Total                                                  70.0%/ 80.0%
+Total                                                  75.0%/ 80.0%
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -60,14 +60,14 @@ System Calls (tests/userprog/Rubric.systemcalls):
 	     1/ 1 tests/userprog/close-normal
 
 	- "exec" system call.
-	  ** 0/ 1 tests/userprog/exec-once
-	  ** 0/ 1 tests/userprog/exec-multiple
+	     1/ 1 tests/userprog/exec-once
+	     1/ 1 tests/userprog/exec-multiple
 
 	- "wait" system call.
 	  ** 0/ 1 tests/userprog/wait-simple
 	  ** 0/ 1 tests/userprog/wait-twice
 
 	- Section summary.
-	     12/ 16 tests passed
-	     12/ 16 points subtotal
+	     14/ 16 tests passed
+	     14/ 16 points subtotal
 
