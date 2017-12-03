@@ -158,15 +158,22 @@ syscall_handler(struct intr_frame *f)
 // *****************************************************************
 
 void sys_exit(int status) 
-{  
-//    printf("\n");
-//    printf("PARENT THREAD: %s\n", thread_current()->parent->name);
-//    printf("CURRENT THREAD: %s\n", thread_current()->name);
-//    printf("STATUS: %d\n", status);
-//    printf("\n");
-    
-  thread_current()->exit_status = status;
-  semaphore_up(&thread_current()->parent->wait_on_child);
+{
+  struct thread *parent = thread_current()->parent;
+  
+//  printf("\n");
+//  printf("In sys_exit\n");
+//  printf("STATUS: %d\n", status);
+//  printf("\n");
+  
+  // Return exit status to parent
+  thread_current()->parent->exit_status = status;
+  
+  if(list_size(&parent->wait_on_child.waiters) >= 1)
+  {
+      semaphore_up(&thread_current()->parent->wait_on_child);
+  }
+
   list_remove(&thread_current()->child_elem);
   
   printf("%s: exit(%d)\n", thread_current()->name, status);  
@@ -375,10 +382,7 @@ static void close_handler(struct intr_frame *f)
 }
 
 static uint32_t sys_exec(const char *file)
-{   
-//    printf("Calling sys_exec\n");
-//    printf("Current thread is sys_exec: %s\n", thread_current()->name);
-    
+{       
     int tid = process_execute(file);
     return tid;
 }
@@ -394,10 +398,8 @@ static void exec_handler(struct intr_frame *f)
 
 static uint32_t sys_wait(int pid)
 {
-    // sys_wait is called
-    int success = process_wait(pid);
-    
-    return success;
+    int wait_pid = process_wait(pid);
+    return wait_pid;
 }
 
 static void wait_handler(struct intr_frame *f)
@@ -406,5 +408,5 @@ static void wait_handler(struct intr_frame *f)
     
     umem_read(f->esp + 4, &pid, sizeof(pid));
     
-    sys_wait(pid);
+    f->eax = sys_wait(pid);
 }

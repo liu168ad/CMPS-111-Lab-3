@@ -17,5 +17,5 @@ pass tests/userprog/write-zero
 pass tests/userprog/close-normal
 pass tests/userprog/exec-once
 pass tests/userprog/exec-multiple
-FAIL tests/userprog/wait-simple
+pass tests/userprog/wait-simple
 FAIL tests/userprog/wait-twice
