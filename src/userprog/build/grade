@@ -1,4 +1,5 @@
-TOTAL TESTING SCORE: 77.5%
+TOTAL TESTING SCORE: 80.0%
+ALL TESTED PASSED -- PERFECT SCORE
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -8,9 +9,9 @@ Test Set                                      Pts Max  % Ttl  % Max
 --------------------------------------------- --- --- ------ ------
 tests/userprog/Rubric.process                   1/  1  30.0%/ 30.0%
 tests/userprog/Rubric.arguments                 4/  4  10.0%/ 10.0%
-tests/userprog/Rubric.systemcalls              15/ 16  37.5%/ 40.0%
+tests/userprog/Rubric.systemcalls              16/ 16  40.0%/ 40.0%
 --------------------------------------------- --- --- ------ ------
-Total                                                  77.5%/ 80.0%
+Total                                                  80.0%/ 80.0%
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -65,9 +66,9 @@ System Calls (tests/userprog/Rubric.systemcalls):
 
 	- "wait" system call.
 	     1/ 1 tests/userprog/wait-simple
-	  ** 0/ 1 tests/userprog/wait-twice
+	     1/ 1 tests/userprog/wait-twice
 
 	- Section summary.
-	     15/ 16 tests passed
-	     15/ 16 points subtotal
+	     16/ 16 tests passed
+	     16/ 16 points subtotal
 

@@ -18,4 +18,4 @@ pass tests/userprog/close-normal
 pass tests/userprog/exec-once
 pass tests/userprog/exec-multiple
 pass tests/userprog/wait-simple
-FAIL tests/userprog/wait-twice
+pass tests/userprog/wait-twice

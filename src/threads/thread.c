@@ -567,7 +567,7 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
-  
+  t->exit_process = false;
   t->exit_status = -999;
   
   semaphore_init(&t->wait_on_child, 0);

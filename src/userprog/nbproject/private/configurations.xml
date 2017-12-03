@@ -8,10 +8,6 @@
         <df name="filesys">
         </df>
         <df name="lib">
-          <df name="kernel">
-          </df>
-          <df name="user">
-          </df>
         </df>
         <df name="tests">
           <df name="userprog">

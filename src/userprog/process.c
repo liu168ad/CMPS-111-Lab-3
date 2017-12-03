@@ -345,18 +345,12 @@ start_process(void *aux)
 int
 process_wait(tid_t child_tid)
 {       
-//    printf("\n");
-//    printf("CHILD ID: %d\n", child_tid);
-//    printf("\n");
-    
     struct thread *current = thread_current();
     
     struct list_elem *e;
     
-    //struct thread *save_child = NULL;
-    
     if(list_size(&current->child_list) >= 1)   
-    {
+    {   
         for (e = list_begin (&current->child_list); e != list_end (&current->child_list);
              e = list_next (e))
           {
@@ -367,34 +361,20 @@ process_wait(tid_t child_tid)
                 if(child->exit_status == -999 )
                 {   
                     semaphore_down(&thread_current()->wait_on_child);
+                    break;
                     
-                    
-                    return current->exit_status;
                 }
             }
           }
     }
-    else //Child finished completing, send exist status up to parent
-    {   
+    
+    if(current->exit_process)
+    {
+        current->exit_process = false;
         return current->exit_status;
     }
     
     return -1;
-    
-//    if(save_child != NULL) //child has not finished yet
-//    {
-//        if(save_child->exit_status == -999)
-//        {
-//            //printf("Semaphore down\n");
-//            semaphore_down(&thread_current()->wait_on_child);
-//        }
-//        
-//        return -1;
-//    }
-//    else 
-//    {
-//        return 0;
-//    }
 }
 
 /* Free the current process's resources. */

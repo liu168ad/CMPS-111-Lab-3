@@ -12,13 +12,19 @@
         <group>
             <file>file:/home/pintos/pintos/src/userprog/process.h</file>
             <file>file:/home/pintos/pintos/src/lib/user/syscall.c</file>
-            <file>file:/home/pintos/pintos/src/userprog/build/tests/userprog/exec-once.output</file>
+            <file>file:/home/pintos/pintos/src/tests/userprog/wait-twice.c</file>
+            <file>file:/home/pintos/pintos/src/tests/userprog/exec-once.c</file>
             <file>file:/home/pintos/pintos/src/threads/init.c</file>
             <file>file:/home/pintos/pintos/src/userprog/utils.h</file>
             <file>file:/home/pintos/pintos/src/userprog/process.c</file>
             <file>file:/home/pintos/pintos/src/threads/thread.h</file>
-            <file>file:/home/pintos/pintos/src/userprog/build/tests/userprog/exec-once.result</file>
+            <file>file:/home/pintos/pintos/src/userprog/build/tests/userprog/wait-simple.result</file>
+            <file>file:/home/pintos/pintos/src/userprog/build/tests/userprog/wait-twice.output</file>
+            <file>file:/home/pintos/pintos/src/userprog/build/tests/userprog/wait-twice.result</file>
+            <file>file:/home/pintos/pintos/src/userprog/build/tests/userprog/wait-simple.output</file>
             <file>file:/home/pintos/pintos/src/threads/thread.c</file>
+            <file>file:/home/pintos/pintos/src/tests/userprog/wait-simple.c</file>
+            <file>file:/home/pintos/pintos/src/tests/userprog/child-simple.c</file>
             <file>file:/home/pintos/pintos/src/threads/semaphore.h</file>
             <file>file:/home/pintos/pintos/src/lib/kernel/list.h</file>
             <file>file:/home/pintos/pintos/src/userprog/syscall.c</file>

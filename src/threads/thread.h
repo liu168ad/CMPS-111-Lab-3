@@ -137,6 +137,7 @@ struct thread
     struct list_elem child_elem;    // List element for the child list
     struct thread *parent;          // Reference to the parent thread
     
+    bool exit_process;
     
     int fd;                     // File descriptor
     struct list file_list;      // List to store files

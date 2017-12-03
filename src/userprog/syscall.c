@@ -158,7 +158,7 @@ syscall_handler(struct intr_frame *f)
 // *****************************************************************
 
 void sys_exit(int status) 
-{
+{   
   struct thread *parent = thread_current()->parent;
   
 //  printf("\n");
@@ -168,6 +168,7 @@ void sys_exit(int status)
   
   // Return exit status to parent
   thread_current()->parent->exit_status = status;
+  thread_current()->parent->exit_process = true;
   
   if(list_size(&parent->wait_on_child.waiters) >= 1)
   {
@@ -175,6 +176,8 @@ void sys_exit(int status)
   }
 
   list_remove(&thread_current()->child_elem);
+  
+  
   
   printf("%s: exit(%d)\n", thread_current()->name, status);  
   thread_exit();
